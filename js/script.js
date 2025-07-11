@@ -42,6 +42,21 @@ const loop = setInterval(() => {
 
 },10)
 
+function checkOrientation() {
+    const message = document.getElementById('rotate-message');
+    if (window.innerHeight > window.innerWidth) {
+        // Está em modo retrato (vertical)
+        message.style.display = 'flex';
+    } else {
+        // Está em modo paisagem (horizontal)
+        message.style.display = 'none';
+    }
+}
+
+window.addEventListener('resize', checkOrientation);
+window.addEventListener('orientationchange', checkOrientation);
+window.addEventListener('load', checkOrientation);
+
 document.addEventListener('keydown', jump)
 document.addEventListener('touchstart', jump);
 document.addEventListener('click', jump);
