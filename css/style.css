@@ -106,3 +106,56 @@
         right: 100%;
     }
 }   
+@media (max-width: 900px) {
+    .reset {
+        width: 80vw;
+        height: 80px;
+        font-size: 18px;
+    }
+    .mario {
+        width: 180px;
+    }
+    .pipe {
+        width: 90px;
+    }
+    .clouds {
+        width: 300px;
+    }
+}
+
+@media (max-width: 600px) {
+    .reset {
+        width: 90vw;
+        height: 60px;
+        font-size: 12px;
+    }
+    .mario {
+        width: 110px;
+    }
+    .pipe {
+        width: 60px;
+    }
+    .clouds {
+        width: 180px;
+    }
+    .game-board {
+        border-bottom-width: 5px;
+    }
+}
+
+@media (max-width: 400px) {
+    .reset {
+        width: 98vw;
+        height: 40px;
+        font-size: 8px;
+    }
+    .mario {
+        width: 70px;
+    }
+    .pipe {
+        width: 40px;
+    }
+    .clouds {
+        width: 100px;
+    }
+}
