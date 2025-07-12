@@ -32,6 +32,7 @@ resetButton.addEventListener('click', () => {
     changePlayerBtn.style.display = 'none';
     music.currentTime = 0;
     music.play();
+    jumpSound.volume = 0.6;
     score = 0;
     if (scoreDisplay) scoreDisplay.textContent = score;
     gameRunning = true;
@@ -201,6 +202,7 @@ function gameOver() {
     gameRunning = false;
      music.currentTime = 0;
     music.pause();
+    jumpSound.volume = 0.0;
     mario.src = './images/game-over.png';
     mario.style.width = '150px';
     gameOverSound.currentTime = 0;
