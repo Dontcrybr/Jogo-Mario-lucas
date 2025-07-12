@@ -2,29 +2,38 @@ const mario = document.querySelector('.mario');
 const pipe = document.querySelector('.pipe');
 const resetButton = document.querySelector('.reset');
 
+pipe.style.display = 'none';
+pipe.style.animation = 'none';
+
 // Sons
 const jumpSound = new Audio('./sounds/Mario-jump-sound.mp3');
 jumpSound.volume = 0.6;
 const gameOverSound = new Audio('./sounds/game over2.mp3');
 const music = new Audio('./sounds/musica de fundo.mp3');
+const contagem = new Audio('./sounds/contagem.mp3');
 
 music.loop = true;
 window.addEventListener('load', () => {
-    music.play();
-    startGame();
+    showLogin();
 });
 
 resetButton.addEventListener('click', () => {
-    // location.reload(); // Se quiser evitar reload, use:
+    // Reseta variáveis do jogo
     pipeSpeed = 18;
-    pipeLeft = document.querySelector('.game-board').offsetWidth;
+    const board = document.querySelector('.game-board');
+    const boardWidth = board ? board.offsetWidth : window.innerWidth;
+    pipeLeft = boardWidth;
     pipe.style.left = pipeLeft + 'px';
-    pipe.style.animation = 'none';
+    pipe.style.animation = 'pipe-animation 1.4s linear infinite';
     mario.src = './images/mario.gif';
     mario.style.width = '300px';
     resetButton.style.display = 'none';
+    rankingBtn.style.display = 'none';
+    changePlayerBtn.style.display = 'none';
     music.currentTime = 0;
     music.play();
+    score = 0;
+    if (scoreDisplay) scoreDisplay.textContent = score;
     gameRunning = true;
     requestAnimationFrame(gameLoop);
 });
@@ -115,11 +124,19 @@ function showLogin() {
     document.querySelector('.score').style.display = 'none';
     resetButton.style.display = 'none';
     rankingBtn.style.display = 'none';
+    mario.src = './images/mario.gif';
+    mario.style.width = '300px';
     changePlayerBtn.style.display = 'none';
+    score = 0;
+    if (scoreDisplay) scoreDisplay.textContent = score;
+     pipe.style.display = 'none';
+    pipe.style.animation = 'none';
 }
 function hideLogin() {
     loginScreen.style.display = 'none';
     document.querySelector('.score').style.display = '';
+     pipe.style.display = 'none';
+    pipe.style.animation = 'pipe-animation 1.4s linear infinite';
 }
 
 if (!playerName) {
@@ -137,8 +154,8 @@ startBtn.onclick = () => {
     }
     playerName = name;
     localStorage.setItem('mario_player_name', playerName);
-    hideLogin();
-    startGame();
+    music.play();
+    startCountdownAndGame(); // Chama a contagem regressiva!
 };
 
 // Trocar jogador
@@ -182,8 +199,8 @@ function saveScore(name, score) {
 function gameOver() {
     if (!gameRunning) return;
     gameRunning = false;
+     music.currentTime = 0;
     music.pause();
-    music.currentTime = 0;
     mario.src = './images/game-over.png';
     mario.style.width = '150px';
     gameOverSound.currentTime = 0;
@@ -194,14 +211,36 @@ function gameOver() {
     saveScore(playerName, score);
 }
 
-// No resetButton, esconda os botões extras:
-resetButton.addEventListener('click', () => {
-    location.reload();
-    rankingBtn.style.display = 'none';
-    changePlayerBtn.style.display = 'none';
-});
-
 // (Opcional) Esconde ranking ao clicar fora do modal
 rankingModal.addEventListener('click', e => {
     if (e.target === rankingModal) rankingModal.style.display = 'none';
 });
+
+const countdownEl = document.querySelector('.countdown');
+
+function startCountdownAndGame() {
+    let count = 3;
+    countdownEl.textContent = count;
+    countdownEl.style.display = 'block';
+    pipe.style.display = 'none'; // Garante que o pipe não aparece antes
+    hideLogin();
+
+    function next() {
+        if (count > 1) {
+            count--;
+            countdownEl.textContent = count;
+            setTimeout(next, 800);
+        } else {
+            countdownEl.textContent = 'Vai!';
+            contagem.currentTime = 1.3;
+            contagem.volume = 1.0;
+            contagem.play();
+            setTimeout(() => {
+                countdownEl.style.display = 'none';
+                pipe.style.display = 'block';
+                startGame();
+            }, 800);
+        }
+    }
+    setTimeout(next, 800);
+}
