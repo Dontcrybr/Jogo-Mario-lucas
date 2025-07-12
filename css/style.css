@@ -27,6 +27,15 @@
         2px -2px 0 #0f0, /* Verde */
         -1px 1px 0 #00f, /* Azul */
         1px 1px 0 #ff0;
+     border: 2px solid #fff;
+    box-shadow: 0 4px 24px #0008;
+    transition: background 0.2s, color 0.2s;
+
+}
+.reset:hover, .reset:focus {
+    background: #2a2c4b;
+    color: #ffe066;
+    outline: none;
 }
 
 
@@ -116,7 +125,7 @@
         width: 180px;
     }
     .pipe {
-        width: 90px;
+        width: 80px;
     }
     .clouds {
         width: 300px;
