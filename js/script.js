@@ -1,99 +1,207 @@
 const mario = document.querySelector('.mario');
 const pipe = document.querySelector('.pipe');
 const resetButton = document.querySelector('.reset');
+
+// Sons
 const jumpSound = new Audio('./sounds/Mario-jump-sound.mp3');
+jumpSound.volume = 0.6;
 const gameOverSound = new Audio('./sounds/game over2.mp3');
 const music = new Audio('./sounds/musica de fundo.mp3');
-music.loop = true; // Faz a música repetir
-music.volume = 0.6; // (opcional) diminui o volume
 
+music.loop = true;
 window.addEventListener('load', () => {
     music.play();
+    startGame();
 });
 
 resetButton.addEventListener('click', () => {
-    location.reload();
+    // location.reload(); // Se quiser evitar reload, use:
+    pipeSpeed = 18;
+    pipeLeft = document.querySelector('.game-board').offsetWidth;
+    pipe.style.left = pipeLeft + 'px';
+    pipe.style.animation = 'none';
+    mario.src = './images/mario.gif';
+    mario.style.width = '300px';
+    resetButton.style.display = 'none';
+    music.currentTime = 0;
+    music.play();
+    gameRunning = true;
+    requestAnimationFrame(gameLoop);
 });
 
-
-
 const jump = () => {
-    // Calcula altura máxima do pulo (máx 35% da altura do game-board ou 180px)
-    const boardHeight = document.querySelector('.game-board').offsetHeight;
-    const jumpHeight = Math.min(boardHeight * 0.5, 200);
+    if (!mario.classList.contains('jump')) {
+        jumpSound.currentTime = 0;
+        jumpSound.play();
 
-    jumpSound.currentTime = 0; // Reseta o tempo do som
-    jumpSound.play();
-
-    mario.classList.add('jump');
-    mario.style.setProperty('--jump-height', `${jumpHeight}px`);
-
-    setTimeout(() => {
-        mario.classList.remove('jump');
-        mario.style.removeProperty('--jump-height');
-    }, 500);
+        mario.classList.add('jump');
+        setTimeout(() => {
+            mario.classList.remove('jump');
+        }, 500);
+    }
 };
 
-// Adapta a animação do pulo para ser responsiva
-const style = document.createElement('style');
-style.innerHTML = `
-@keyframes jump {
-    0% { bottom: 0; }
-    40% { bottom: var(--jump-height, 130px); }
-    50% { bottom: var(--jump-height, 130px); }
-    60% { bottom: var(--jump-height, 130px); }
-    100% { bottom: 0; }
-}`;
-document.head.appendChild(style);
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.code === 'ArrowUp') jump();
+});
+document.addEventListener('click', jump);
+document.addEventListener('touchstart', jump);
 
-const loop = setInterval(() => {
-    const pipePosition = pipe.offsetLeft;
-    const marioPosition = +window.getComputedStyle(mario).bottom.replace('px', '');
+// MOVIMENTO SUAVE DO PIPE
+let pipeSpeed = 18; // pixels por frame (aumenta para ficar mais rápido)
+let speedIncrease = 0.04; // quanto aumenta por frame
+let pipeLeft = 800; // posição inicial (ajuste conforme seu layout)
+let gameRunning = true;
 
-    // Responsivo: limites proporcionais ao tamanho da tela
-    const boardWidth = document.querySelector('.game-board').offsetWidth;
-    const boardHeight = document.querySelector('.game-board').offsetHeight;
-    const collisionLimit = boardWidth * 0.20;
-
-    // Altura do Mario para colisão (pega o height real)
-    const marioHeight = mario.offsetHeight;
-    // O Mario só morre se estiver baixo o suficiente para "bater" no pipe
-    const marioColide = marioPosition < (pipe.offsetHeight * 0.6);
-
-    if (pipePosition <= collisionLimit && pipePosition > 0 && marioColide) {
-        gameOverSound.play();
-        music.pause(); 
-        music.currentTime = 0; 
-        pipe.style.animation = 'none';
-        pipe.style.left = `${pipePosition}px`;
-
-        mario.style.animation = 'none';
-        mario.style.bottom = `${marioPosition}px`;
-        mario.src = './images/game-over.png';
-        mario.style.width = `${mario.offsetWidth * 0.55}px`;
-        mario.style.marginLeft = `${mario.offsetWidth * 0.7}px`;
-
-        resetButton.style.display = 'block';
-
-        clearInterval(loop);
-    }
-}, 10);
-
-function checkOrientation() {
-    const message = document.getElementById('rotate-message');
-    if (window.innerHeight > window.innerWidth) {
-        // Está em modo retrato (vertical)
-        message.style.display = 'flex';
-    } else {
-        // Está em modo paisagem (horizontal)
-        message.style.display = 'none';
-    }
+function startGame() {
+    // Garante que o pipe começa fora da tela à direita do game-board
+    const board = document.querySelector('.game-board');
+    const boardWidth = board ? board.offsetWidth : window.innerWidth;
+    pipeLeft = boardWidth; // Começa exatamente na borda direita
+    pipe.style.left = pipeLeft + 'px';
+    pipe.style.animation = 'none'; // remove animação CSS
+    gameRunning = true;
+    requestAnimationFrame(gameLoop);
 }
 
-window.addEventListener('resize', checkOrientation);
-window.addEventListener('orientationchange', checkOrientation);
-window.addEventListener('load', checkOrientation);
+let score = 0;
+const scoreDisplay = document.querySelector('.score'); // Adicione um elemento no HTML
 
-document.addEventListener('keydown', jump)
-document.addEventListener('touchstart', jump);
-document.addEventListener('click', jump);
+function gameLoop() {
+    if (!gameRunning) return;
+
+    pipeLeft -= pipeSpeed;
+    pipe.style.left = pipeLeft + 'px';
+
+    if (pipeLeft < -pipe.offsetWidth) {
+        const board = document.querySelector('.game-board');
+        const boardWidth = board ? board.offsetWidth : window.innerWidth;
+        pipeLeft = boardWidth;
+        pipeSpeed += speedIncrease;
+        score++;
+        if (scoreDisplay) scoreDisplay.textContent = score;
+    }
+
+    // Colisão
+    const pipeRect = pipe.getBoundingClientRect();
+    const marioRect = mario.getBoundingClientRect();
+    if (
+        pipeRect.left < marioRect.right - 50 &&
+        pipeRect.right > marioRect.left + 50 &&
+        marioRect.bottom > pipeRect.top + 10
+    ) {
+        gameOver();
+        return;
+    }
+
+    requestAnimationFrame(gameLoop);
+}
+
+// ... Seu código anterior ...
+
+let playerName = localStorage.getItem('mario_player_name') || '';
+const loginScreen = document.querySelector('.login-screen');
+const playerNameInput = document.getElementById('playerNameInput');
+const startBtn = document.getElementById('startBtn');
+const rankingBtn = document.querySelector('.ranking-btn');
+const changePlayerBtn = document.querySelector('.change-player-btn');
+const rankingModal = document.querySelector('.ranking-modal');
+const rankingList = document.querySelector('.ranking-list');
+const closeRanking = document.querySelector('.close-ranking');
+
+// Exibe tela de login se não houver nome salvo
+function showLogin() {
+    loginScreen.style.display = 'flex';
+    document.querySelector('.score').style.display = 'none';
+    resetButton.style.display = 'none';
+    rankingBtn.style.display = 'none';
+    changePlayerBtn.style.display = 'none';
+}
+function hideLogin() {
+    loginScreen.style.display = 'none';
+    document.querySelector('.score').style.display = '';
+}
+
+if (!playerName) {
+    showLogin();
+} else {
+    hideLogin();
+}
+
+// Começar com nome
+startBtn.onclick = () => {
+    const name = playerNameInput.value.trim();
+    if (name.length < 2) {
+        alert('Digite um nome com pelo menos 2 letras!');
+        return;
+    }
+    playerName = name;
+    localStorage.setItem('mario_player_name', playerName);
+    hideLogin();
+    startGame();
+};
+
+// Trocar jogador
+changePlayerBtn.onclick = () => {
+    playerName = '';
+    localStorage.removeItem('mario_player_name');
+    showLogin();
+};
+
+// Ranking
+rankingBtn.onclick = showRanking;
+closeRanking.onclick = () => rankingModal.style.display = 'none';
+
+function showRanking() {
+    const ranking = JSON.parse(localStorage.getItem('mario_ranking') || '[]');
+    rankingList.innerHTML = ranking
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10)
+        .map((item, i) => `<li>${i+1}. ${item.name} - ${item.score}</li>`)
+        .join('');
+    rankingModal.style.display = 'flex';
+}
+
+// Salvar score no ranking local
+function saveScore(name, score) {
+    if (!name || score <= 0) return;
+    let ranking = JSON.parse(localStorage.getItem('mario_ranking') || '[]');
+    const idx = ranking.findIndex(item => item.name.toLowerCase() === name.toLowerCase());
+    if (idx !== -1) {
+        // Atualiza apenas se o novo score for maior
+        if (score > ranking[idx].score) {
+            ranking[idx].score = score;
+        }
+    } else {
+        ranking.push({ name, score });
+    }
+    localStorage.setItem('mario_ranking', JSON.stringify(ranking));
+}
+
+// Modifique seu gameOver:
+function gameOver() {
+    if (!gameRunning) return;
+    gameRunning = false;
+    music.pause();
+    music.currentTime = 0;
+    mario.src = './images/game-over.png';
+    mario.style.width = '150px';
+    gameOverSound.currentTime = 0;
+    gameOverSound.play();
+    resetButton.style.display = 'block';
+    rankingBtn.style.display = 'block';
+    changePlayerBtn.style.display = 'block';
+    saveScore(playerName, score);
+}
+
+// No resetButton, esconda os botões extras:
+resetButton.addEventListener('click', () => {
+    location.reload();
+    rankingBtn.style.display = 'none';
+    changePlayerBtn.style.display = 'none';
+});
+
+// (Opcional) Esconde ranking ao clicar fora do modal
+rankingModal.addEventListener('click', e => {
+    if (e.target === rankingModal) rankingModal.style.display = 'none';
+});

@@ -1,31 +1,53 @@
  <!DOCTYPE html>
- <html lang="en">
- <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="shortcut icon" href="./images/mario.gif" type="image/x-icon">
-   
-    <title>Mario Jump</title>
- </head>
- <body>
+        <link rel="stylesheet" href="./css/style.css">
+        <link rel="shortcut icon" href="./images/mario.gif" type="image/x-icon">
 
-    <!-- Adicione isso no seu HTML, dentro do <body> -->
-<div id="rotate-message" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000a;color:#fff;z-index:999999;align-items:center;justify-content:center;font-size:2em;text-align:center;">
-    Por favor, gire seu dispositivo para o modo paisagem (horizontal) para jogar!
+        <title>Mario Jump</title>
+    </head>
+    <body>
+
+        <div class="login-screen" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#222c;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <h2
+                style="color:#fff;font-family:'Press Start 2P',monospace;">Digite
+                seu nome</h2>
+            <input id="playerNameInput" type="text" maxlength="16"
+                style="font-size:20px;padding:8px;margin:16px 0;border-radius:6px;border:none;text-align:center;">
+            <button id="startBtn"
+                style="font-size:18px;padding:8px 24px;border-radius:6px;cursor:pointer;">Começar</button>
+        </div>
+
+        <div class="game-board">
+
+            <span class="score"
+                style="position:absolute;top:20px;left:30px;font-size:32px;color:#fff;font-family:'Press Start 2P',monospace;z-index:10;">
+                0
+            </span>
+
+            <button class="reset" style="display:none;">JOGAR NOVAMENTE</button>
+            <button class="ranking-btn gamify-btn" style="display:none;">Ranking</button>
+<button class="change-player-btn gamify-btn" style="display:none;">Outro Jogador</button>
+
+            <div class="ranking-modal" style="display:none;position:fixed;top:0;left:0;  width:100vw;height:100vh;background:#000a;z-index:20000;align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:32px 24px;border-radius:12px;max-width:90vw;">
+        <h2 style="font-family:'Press Start 2P',monospace; text-align: center ; font-size:22px;margin-bottom:18px;">Ranking</h2>
+        <ol class="ranking-list" style="font-size:20px;font-family:monospace;line-height: 30px; max-width: 400px; max-height: 500px; overflow: auto;"></ol>
+        <button class="close-ranking" style="margin-top:18px;font-size:16px;padding:6px 18px;border-radius:6px;cursor:pointer;">Fechar</button>
+    </div>
 </div>
 
-    <div class="game-board">
+            <img src="./images/clouds.png" alt class="clouds">
+            <img src="./images/mario.gif" alt class="mario">
+            <img src="./images/pipe.png" alt class="pipe">
 
-        <img src="./images/clouds.png" alt="" class="clouds">
-        <img src="./images/mario.gif" alt="" class="mario">
-        <img src="./images/pipe.png" alt="" class="pipe">
+            <button class="reset"><h1>JOGAR NOVAMENTE</h1></button>
 
-        <button class="reset"><h1>JOGAR NOVAMENTE</h1></button>
+        </div>
 
-    </div>
-    
-     <script src="./js/script.js"></script>
- </body>
- </html>
+        <script src="./js/script.js"></script>
+    </body>
+</html>
